@@ -28,10 +28,23 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-
 	struct timeval main_begin_time, main_stop_time;
-		gettimeofday(&main_begin_time, NULL);
-		printf("main_stop_time--> %ld \n", main_stop_time.tv_usec);
+	gettimeofday(&main_begin_time, NULL);
+	printf("main_stop_time--> %ld \n", main_stop_time.tv_usec);
+
+	time_t time_begin = time(NULL);
+	struct tm tm_begin = {0};
+	localtime_r(&time_begin, &tm_begin);
+
+
+	char time_buf_begin[50] = {0};
+	strftime(time_buf_begin,50,"%H:%M:%S",&tm_begin);
+	printf("%s \n",time_buf_begin);
+
+
+
+
+
 
 
 
@@ -101,11 +114,18 @@ int main(int argc, char **argv)
 
 
 	printf("=======对数据加密成功====\n");
-	gettimeofday(&main_stop_time, NULL);
-	printf("main_stop_time--> %ld \n",main_stop_time.tv_usec);
-	printf("main_begin_time--> %ld \n",main_begin_time.tv_usec);
-	printf("%d个文件 加解密用时----> %ld \n",test_num, main_stop_time.tv_usec - main_begin_time.tv_usec);
 
+	time_t time_end = time(NULL);
+	struct tm tm_end = {0};
+	localtime_r(&time_end, &tm_end);
+
+	char time_buf_end[50] = {0};
+	strftime(time_buf_end,50,"%H:%M:%S",&tm_end);
+	printf("%s \n",time_buf_end);
+
+
+//	printf("%d个文件 加解密用时----> %d:min %d:s \n",test_num, tm_end.tm_min - tm_begin.tm_min, tm_end.tm_sec - tm_begin.tm_sec);
+//
 
 
 	close_devices_and_session(hDeviceHandle, hSessionHandle);
