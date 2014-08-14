@@ -8,7 +8,7 @@
 # include "mysansec.h"
 
 
-extern void *hSessionHandle;
+
 extern void *hSessionHandle;
 extern unsigned int algorithm_id;  // 指定算法标识
 extern unsigned int key_len;
@@ -113,14 +113,18 @@ int add_node_to_list(struct _Head_File_Mutex *head, struct _List_File_Mutex *nod
  */
 int destroy_list(struct _Head_File_Mutex *head)
 {
+	printf("%s,%d\n", __FUNCTION__, __LINE__);
 	struct _List_File_Mutex *index = head->next;
 	struct _List_File_Mutex *temp = head->next;
+	printf("%s,%d\n", __FUNCTION__, __LINE__);
+
 	while(NULL != temp)
 	{
-		free(temp);
 		temp = index->next;
+		free(index);
 		index = temp;
 	}
+	printf("%s,%d\n", __FUNCTION__, __LINE__);
 	free(head);
 	return 0;
 }
@@ -638,5 +642,19 @@ int FileRead(char *filename, char *mode, unsigned char *buffer, size_t size)
 	}
 	fclose(fp);
 	return rwed;
+}
+
+/**
+ * 硬件加密是否可行检查
+ * 返回,非SDR_OK则代表硬件加解密无法使用,之后的加解密采用软件解密
+ */
+int check_hardware(void)
+{
+	int ret;
+	DEVICEINFO device_info;  // 获取设备信息
+	if (SDR_OK != (ret = SDF_GetDeviceInfo(hSessionHandle, &device_info))) {
+		print_error_msg(ret, "获取设备信息失败,现在采用软加密");
+		return ret;
+	}
 }
 

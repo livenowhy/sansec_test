@@ -117,27 +117,27 @@ int init_log_list(int num, struct _Log_Info *p_log_info_st)  // num --> log链�
 }
 
 //int add_log_msg_to_list(struct _Log_Msg_List_Index *add_index, char *msg, int msg_len) // 向链表的节点添加信息
-int add_log_msg_to_list(struct _Log_Info *p_log_info_st, char *msg, int msg_len) // 向链表的节点添加信息
+int add_log_msg_to_list(struct _Log_Msg_List_Index *add_index, char *msg, int msg_len) // 向链表的节点添加信息
 {
-	pthread_mutex_lock(&(p_log_info_st->log_list_add_index->lock_list_index));
+	pthread_mutex_lock(&(add_index->lock_list_index));
 
-	if(NULL == p_log_info_st->log_list_add_index->next->next)
+	if(NULL == add_index->next->next)
 	{
 		printf("NULL == add_index->next->next \n");
 
 	}
 	else
 	{
-		p_log_info_st->log_list_add_index->log_msg_num++;
+		add_index->log_msg_num++;
 
-		p_log_info_st->log_list_add_index->next->tag = 'T';
+	    add_index->next->tag = 'T';
 
 
-		p_log_info_st->log_list_add_index->next->buf_len = msg_len;
+		add_index->next->buf_len = msg_len;
 		printf("%s,%d\n", __FUNCTION__, __LINE__);
-		strcpy(p_log_info_st->log_list_add_index->next->buf, msg);
-		p_log_info_st->log_list_add_index->next = p_log_info_st->log_list_add_index->next->next;
-		pthread_mutex_unlock(&(p_log_info_st->log_list_add_index->lock_list_index));
+		strcpy(add_index->next->buf, msg);
+		add_index->next = add_index->next->next;
+		pthread_mutex_unlock(&(add_index->lock_list_index));
 
 	}
 
@@ -210,7 +210,7 @@ int main(int argc, char **argv)
 	//int add_log_msg_to_list(struct _Log_Msg_List_Index *add_index, char *msg, int msg_len)
 	for(i = 0; i < 20; i++)
 	{
-		add_log_msg_to_list(&log_info_st, temp_buf, 8);
+		add_log_msg_to_list(log_info_st.log_list_add_index, temp_buf, 8);
 	}
 
 

@@ -28,24 +28,6 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	struct timeval main_begin_time, main_stop_time;
-	gettimeofday(&main_begin_time, NULL);
-	printf("main_stop_time--> %ld \n", main_stop_time.tv_usec);
-
-	time_t time_begin = time(NULL);
-	struct tm tm_begin = {0};
-	localtime_r(&time_begin, &tm_begin);
-
-
-	char time_buf_begin[50] = {0};
-	strftime(time_buf_begin,50,"%H:%M:%S",&tm_begin);
-	printf("%s \n",time_buf_begin);
-
-
-
-
-
-
 
 
 	char *num_ch = argv[1];
@@ -76,15 +58,20 @@ int main(int argc, char **argv)
 	}
 
 	int ret;
-	if (SDR_OK != (ret = SDF_OpenDevice(&hDeviceHandle))) {
+	if (SDR_OK != (ret = SDF_OpenDevice(&hDeviceHandle)))
+	{
 		print_error_msg(ret, "打开设备失败");
-		return ret;
+
 	}
+	printf("错误码 ----> %x,%d",ret, ret);
 
 	if (SDR_OK != (ret = SDF_OpenSession(hDeviceHandle, &hSessionHandle))) {
 		print_error_msg(ret, "打开会话失败");
-		return ret;
 	}
+
+	check_hardware();
+
+	printf("错误码 ----> %x,%d",ret, ret);
 
 
 	//获取指定长度的随机数
@@ -105,6 +92,15 @@ int main(int argc, char **argv)
 	pthread_t pid_encrypt[MAX_PTHREAD];  //MAX_PTHREAD 加密线程
 	pthread_t pid_decrypt[MAX_PTHREAD];  //MAX_PTHREAD 解密线程
 
+	time_t time_begin = time(NULL);
+	struct tm tm_begin = {0};
+	localtime_r(&time_begin, &tm_begin);
+
+
+	char time_buf_begin[50] = {0};
+	strftime(time_buf_begin,50,"%H:%M:%S",&tm_begin);
+	printf("%s \n",time_buf_begin);
+
 
 
 	create_encrypt_pthread(head, &pid_encrypt);  // 创建加密线程，并且加入了等待线程结束的代码
@@ -115,6 +111,9 @@ int main(int argc, char **argv)
 
 	printf("=======对数据加密成功====\n");
 
+
+
+	close_devices_and_session(hDeviceHandle, hSessionHandle);
 	time_t time_end = time(NULL);
 	struct tm tm_end = {0};
 	localtime_r(&time_end, &tm_end);
@@ -124,11 +123,9 @@ int main(int argc, char **argv)
 	printf("%s \n",time_buf_end);
 
 
-//	printf("%d个文件 加解密用时----> %d:min %d:s \n",test_num, tm_end.tm_min - tm_begin.tm_min, tm_end.tm_sec - tm_begin.tm_sec);
-//
+	printf("%d个文件 加解密用时----> %d:min %d:s \n",test_num, tm_end.tm_min - tm_begin.tm_min, tm_end.tm_sec - tm_begin.tm_sec);
 
-
-	close_devices_and_session(hDeviceHandle, hSessionHandle);
 	destroy_list(head);
+
 	return 0;
 }
